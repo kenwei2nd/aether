@@ -1,0 +1,5 @@
+file 'e:/CLAUDE/enable-agency-2/public/segments/s1.mp4'
+file 'e:/CLAUDE/enable-agency-2/public/segments/s2.mp4'
+file 'e:/CLAUDE/enable-agency-2/public/segments/s3.mp4'
+file 'e:/CLAUDE/enable-agency-2/public/segments/s4.mp4'
+file 'e:/CLAUDE/enable-agency-2/public/segments/s5.mp4'
