@@ -1,0 +1,92 @@
+/* ============================================================
+   Globe Section — full-viewport, deep space, immersive
+   Continuous dark from About, transitions to paper for Showcase
+   ============================================================ */
+
+.section {
+  position: relative;
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 50% 30%, #0d1a2e 0%, #070d18 50%, #030608 100%);
+  color: var(--paper);
+  font-family: var(--font-display);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Starfield canvas ─────────────────────── */
+.starfield {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Text block — top center ──────────────── */
+.text {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: clamp(56px, 8vh, 96px) clamp(24px, 6vw, 80px) 0;
+  max-width: 720px;
+}
+
+.eyebrow {
+  font-size: clamp(10px, 0.8vw, 12px);
+  font-weight: 500;
+  letter-spacing: 0.44em;
+  text-indent: 0.44em;
+  color: rgba(106, 166, 255, 0.7);
+  margin-bottom: clamp(16px, 2vh, 24px);
+}
+
+.headline {
+  font-size: clamp(44px, 7vw, 100px);
+  font-weight: 600;
+  line-height: 0.97;
+  letter-spacing: -0.04em;
+  color: var(--paper);
+  margin-bottom: clamp(16px, 2.5vh, 24px);
+}
+
+.sub {
+  font-size: clamp(13px, 1.1vw, 16px);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.38);
+}
+
+/* ── Globe ────────────────────────────────── */
+.globeWrap {
+  position: relative;
+  z-index: 1;
+  margin-top: clamp(-40px, -4vh, -20px);
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  will-change: transform, opacity;
+}
+
+.placeholder {
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 38% 38%,
+    rgba(30, 58, 138, 0.25),
+    rgba(3, 6, 8, 0.9)
+  );
+}
+
+/* ── Bottom transition — ink → paper ─────── */
+.bottomFade {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  height: 30vh;
+  background: linear-gradient(to bottom, transparent 0%, var(--paper) 100%);
+  pointer-events: none;
+  flex-shrink: 0;
+}

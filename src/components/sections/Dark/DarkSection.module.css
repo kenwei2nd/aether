@@ -1,0 +1,303 @@
+/* ============================================================
+   DarkSection — unified About + Globe
+   Single dark canvas: hero ink → deep space → paper (Showcase)
+   Starfield masked to appear only in lower/globe portion
+   ============================================================ */
+
+.dark {
+  position: relative;
+  background: linear-gradient(
+    to bottom,
+    var(--ink) 0%,
+    #060c16 50%,
+    #030608 100%
+  );
+  color: var(--paper);
+  font-family: var(--font-display);
+  overflow: hidden;
+}
+
+/* ── Starfield ────────────────────────────────────────────── */
+.starfield {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  /* Stars invisible at top (About area), fade in toward Globe */
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 35%, black 55%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 35%, black 55%);
+}
+
+/* ── About block ──────────────────────────────────────────── */
+.aboutBlock {
+  position: relative;
+  z-index: 1;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: clamp(80px, 12vh, 140px) clamp(24px, 6vw, 80px) clamp(40px, 6vh, 64px);
+}
+
+.eyebrow {
+  font-size: clamp(10px, 0.8vw, 12px);
+  font-weight: 500;
+  letter-spacing: 0.42em;
+  text-indent: 0.42em;
+  color: rgba(255, 255, 255, 0.35);
+  margin-bottom: clamp(20px, 3vh, 32px);
+}
+
+/* Headline — scroll-scrubbed opacity */
+.headline {
+  font-size: clamp(64px, 11vw, 160px);
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  color: var(--paper);
+  margin-bottom: clamp(40px, 6vh, 64px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.04em;
+}
+
+.headline em {
+  font-style: italic;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.hLine {
+  display: block;
+  opacity: 0;
+  will-change: opacity, transform;
+}
+
+/* Body */
+.body {
+  font-size: clamp(15px, 1.2vw, 18px);
+  font-weight: 400;
+  line-height: 1.72;
+  color: rgba(255, 255, 255, 0.45);
+  max-width: 560px;
+  margin-bottom: clamp(48px, 7vh, 80px);
+}
+
+.word {
+  display: inline;
+  opacity: 0;
+}
+
+/* Stats */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: clamp(24px, 4vh, 40px) 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.statItem:last-child { border-right: none; }
+
+.statValue {
+  font-size: clamp(40px, 5vw, 72px);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: var(--paper);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: clamp(9px, 0.7vw, 11px);
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
+  color: rgba(255, 255, 255, 0.28);
+  text-transform: uppercase;
+}
+
+/* ── Marquee ──────────────────────────────────────────────── */
+.marqueeTrack {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  overflow: hidden;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: clamp(14px, 2vh, 20px) 0;
+  margin: clamp(40px, 6vh, 64px) 0;
+}
+
+.marqueeInner {
+  display: flex;
+  white-space: nowrap;
+  animation: marquee 32s linear infinite;
+  font-size: clamp(11px, 0.9vw, 13px);
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+  color: rgba(255, 255, 255, 0.18);
+}
+
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-33.333%); }
+}
+
+/* ── Cards ────────────────────────────────────────────────── */
+.cardsWrap {
+  position: relative;
+  z-index: 1;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 clamp(24px, 6vw, 80px) clamp(64px, 10vh, 100px);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+}
+
+.card {
+  background: var(--ink);
+  padding: clamp(28px, 4vw, 48px);
+  opacity: 0;
+  transition:
+    background 0.4s var(--ease-out-cubic),
+    transform 0.4s var(--ease-out-cubic),
+    box-shadow 0.4s var(--ease-out-cubic);
+}
+
+.card:hover {
+  background: rgba(255, 255, 255, 0.03);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 2;
+}
+
+.cardIndex {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  color: rgba(255, 255, 255, 0.2);
+  margin-bottom: clamp(16px, 2.5vh, 24px);
+}
+
+.cardTitle {
+  font-size: clamp(18px, 1.8vw, 26px);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--paper);
+  margin-bottom: clamp(14px, 2vh, 20px);
+}
+
+.cardRule {
+  width: 24px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.18);
+  margin-bottom: clamp(14px, 2vh, 20px);
+  transition: width 0.4s var(--ease-out-cubic), background 0.4s;
+}
+
+.card:hover .cardRule {
+  width: 40px;
+  background: var(--amber);
+}
+
+.cardBody {
+  font-size: clamp(13px, 1vw, 15px);
+  font-weight: 400;
+  line-height: 1.72;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* ── Globe block ──────────────────────────────────────────── */
+.globeBlock {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(32px, 5vh, 64px) clamp(24px, 6vw, 80px) 0;
+}
+
+.globeText {
+  text-align: center;
+  max-width: 640px;
+  margin-bottom: clamp(16px, 3vh, 32px);
+}
+
+.globeEyebrow {
+  font-size: clamp(10px, 0.8vw, 12px);
+  font-weight: 500;
+  letter-spacing: 0.44em;
+  text-indent: 0.44em;
+  color: rgba(106, 166, 255, 0.7);
+  margin-bottom: clamp(12px, 2vh, 20px);
+}
+
+.globeHeadline {
+  font-size: clamp(44px, 7vw, 100px);
+  font-weight: 600;
+  line-height: 0.97;
+  letter-spacing: -0.04em;
+  color: var(--paper);
+  margin-bottom: clamp(14px, 2vh, 20px);
+}
+
+.globeSub {
+  font-size: clamp(13px, 1.1vw, 16px);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.globeWrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: clamp(-30px, -3vh, -10px);
+  will-change: transform, opacity;
+}
+
+.globePlaceholder {
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 38% 38%,
+    rgba(30, 58, 138, 0.2),
+    rgba(3, 6, 8, 0.95)
+  );
+}
+
+/* ── Bottom transition — ink → paper ─────────────────────── */
+.bottomFade {
+  position: relative;
+  z-index: 2;
+  height: 32vh;
+  background: linear-gradient(to bottom, transparent 0%, var(--paper) 100%);
+  pointer-events: none;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 720px) {
+  .stats { grid-template-columns: 1fr; }
+  .statItem { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .statItem:last-child { border-bottom: none; }
+  .grid { grid-template-columns: 1fr; }
+}

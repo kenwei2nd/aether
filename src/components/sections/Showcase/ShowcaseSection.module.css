@@ -1,0 +1,200 @@
+/* ============================================================
+   Aircraft Showcase Section
+   Layout: 3-column grid (headline-left | aircraft | model-right)
+   followed by a spec grid and CTA
+   ============================================================ */
+
+.showcase {
+  position: relative;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-display);
+  padding: clamp(64px, 10vw, 120px) clamp(24px, 6vw, 80px);
+  overflow: hidden;
+}
+
+/* ---------- Main 3-col layout ---------- */
+.inner {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr 1fr;
+  align-items: center;
+  gap: clamp(24px, 4vw, 48px);
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* ---------- Left headline ---------- */
+.headlineLeft {
+  opacity: 0;
+}
+
+.kicker {
+  font-size: clamp(10px, 0.8vw, 12px);
+  font-weight: 500;
+  letter-spacing: 0.38em;
+  text-indent: 0.38em;
+  color: rgba(10, 13, 18, 0.4);
+  margin-bottom: clamp(16px, 2.5vh, 28px);
+}
+
+.headlineText {
+  font-size: clamp(36px, 5vw, 72px);
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+
+/* ---------- Aircraft SVG placeholder ---------- */
+.aircraftWrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  padding: clamp(16px, 2vw, 32px) 0;
+}
+
+.aircraftSvg {
+  width: clamp(140px, 18vw, 260px);
+  height: auto;
+  color: var(--ink);
+}
+
+/* ---------- Right model info ---------- */
+.headlineRight {
+  opacity: 0;
+}
+
+.modelNumber {
+  font-size: clamp(40px, 6vw, 88px);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  color: var(--ink);
+  margin-bottom: clamp(12px, 1.5vh, 20px);
+}
+
+.modelCategory {
+  font-size: clamp(13px, 1.1vw, 16px);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+  line-height: 1.4;
+  margin-bottom: clamp(16px, 2.5vh, 28px);
+}
+
+.modelDesc {
+  font-size: clamp(13px, 1vw, 15px);
+  font-weight: 400;
+  line-height: 1.65;
+  color: rgba(10, 13, 18, 0.55);
+  max-width: 320px;
+}
+
+/* ---------- Divider ---------- */
+.divider {
+  max-width: 1440px;
+  margin: clamp(40px, 6vh, 64px) auto;
+  height: 1px;
+  background: rgba(10, 13, 18, 0.1);
+}
+
+/* ---------- Spec grid ---------- */
+.specs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(24px, 4vh, 40px) clamp(24px, 4vw, 48px);
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.specItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  opacity: 0;
+}
+
+.specLabel {
+  font-size: clamp(9px, 0.75vw, 11px);
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
+  color: rgba(10, 13, 18, 0.38);
+  text-transform: uppercase;
+}
+
+.specValue {
+  font-size: clamp(18px, 2vw, 26px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+/* ---------- CTA ---------- */
+.ctaWrap {
+  max-width: 1440px;
+  margin: clamp(40px, 6vh, 64px) auto 0;
+  display: flex;
+  justify-content: center;
+  opacity: 0;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 28px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  transition:
+    background 0.35s var(--ease-out-cubic),
+    transform 0.35s var(--ease-out-cubic);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.cta:hover {
+  background: var(--amber);
+  color: var(--ink);
+  transform: translateY(-2px);
+}
+
+.cta svg {
+  transition: transform 0.35s var(--ease-out-cubic);
+}
+
+.cta:hover svg {
+  transform: translateX(4px);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .inner {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .aircraftWrap {
+    order: -1;
+  }
+
+  .modelDesc {
+    max-width: 100%;
+  }
+
+  .specs {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .specs {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

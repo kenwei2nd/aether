@@ -1,5 +1,7 @@
 import { useLenisScroll } from '@hooks/useLenisScroll'
 import HeroSection from '@components/sections/Hero/HeroSection'
+import DarkSection from '@components/sections/Dark/DarkSection'
+import ShowcaseSection from '@components/sections/Showcase/ShowcaseSection'
 
 export default function App() {
   useLenisScroll()
@@ -7,19 +9,8 @@ export default function App() {
   return (
     <main>
       <HeroSection />
-      <section
-        style={{
-          minHeight: '100vh',
-          display: 'grid',
-          placeItems: 'center',
-          background: 'var(--paper)',
-          color: 'var(--ink)',
-        }}
-      >
-        <p style={{ fontFamily: 'var(--font-display)', fontSize: 24 }}>
-          Next section — your story continues here.
-        </p>
-      </section>
+      <DarkSection />
+      <ShowcaseSection />
     </main>
   )
 }

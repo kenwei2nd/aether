@@ -224,6 +224,46 @@
   transition: transform 0.25s var(--ease-out-cubic);
 }
 
+/* ---------- Epilogue copy (frozen-frame text reveals) ---------- */
+.epilogueCopy {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(12px, 2.5vh, 28px);
+  pointer-events: none;
+  padding: clamp(24px, 5vw, 64px);
+}
+
+.epilogueLine {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(24px, 4vw, 60px);
+  letter-spacing: 0.08em;
+  text-indent: 0.08em;
+  color: var(--paper);
+  text-shadow: 0 2px 32px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+/* ---------- Bottom gradient — bleeds canvas into next section ---------- */
+.bottomGradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 70vh;
+  z-index: 3;
+  background: linear-gradient(to bottom, transparent 0%, var(--ink) 100%);
+  pointer-events: none;
+  opacity: 0;
+  will-change: opacity;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .scrollHintLine::after {
     animation: none;

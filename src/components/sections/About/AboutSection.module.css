@@ -1,0 +1,231 @@
+/* ============================================================
+   About Section — dark ink, cinematic animations
+   Transitions: paper (hero) → paper→ink strip → solid ink
+   ============================================================ */
+
+.about {
+  position: relative;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-display);
+  overflow: hidden;
+}
+
+/* paper→ink transition at the very top */
+.topFade {
+  height: 32vh;
+  background: linear-gradient(to bottom, var(--paper) 0%, var(--ink) 100%);
+  pointer-events: none;
+}
+
+.inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: clamp(40px, 6vw, 80px) clamp(24px, 6vw, 80px);
+}
+
+/* ---------- Eyebrow ---------- */
+.eyebrow {
+  font-size: clamp(10px, 0.8vw, 12px);
+  font-weight: 500;
+  letter-spacing: 0.42em;
+  text-indent: 0.42em;
+  color: rgba(255, 255, 255, 0.35);
+  margin-bottom: clamp(20px, 3vh, 32px);
+  opacity: 0;
+}
+
+/* ---------- Headline — scroll-scrubbed opacity reveal ---------- */
+.headline {
+  font-size: clamp(64px, 11vw, 160px);
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  color: var(--paper);
+  margin-bottom: clamp(40px, 6vh, 64px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.04em;
+}
+
+.headline em {
+  font-style: italic;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* each line is individually targeted by GSAP scrub */
+.hLine {
+  display: block;
+  opacity: 0;
+  transform: translateY(32px);
+  will-change: opacity, transform;
+}
+
+/* ---------- Body — word wave ---------- */
+.body {
+  font-size: clamp(15px, 1.2vw, 18px);
+  font-weight: 400;
+  line-height: 1.72;
+  color: rgba(255, 255, 255, 0.45);
+  max-width: 560px;
+  margin-bottom: clamp(48px, 7vh, 80px);
+}
+
+.word {
+  display: inline;
+  opacity: 0;
+}
+
+/* ---------- Stats row ---------- */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 0;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: clamp(24px, 4vh, 40px) 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.statItem:last-child {
+  border-right: none;
+}
+
+.statValue {
+  font-size: clamp(40px, 5vw, 72px);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: var(--paper);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: clamp(9px, 0.7vw, 11px);
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+}
+
+/* ---------- Marquee ticker ---------- */
+.marqueeTrack {
+  width: 100%;
+  overflow: hidden;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: clamp(14px, 2vh, 20px) 0;
+  margin: clamp(40px, 6vh, 64px) 0;
+}
+
+.marqueeInner {
+  display: flex;
+  white-space: nowrap;
+  animation: marquee 32s linear infinite;
+  font-size: clamp(11px, 0.9vw, 13px);
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+  color: rgba(255, 255, 255, 0.22);
+}
+
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-33.333%); }
+}
+
+/* ---------- Feature card grid ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 2px;
+}
+
+.card {
+  background: var(--ink);
+  padding: clamp(28px, 4vw, 48px);
+  opacity: 0;
+  transition:
+    background 0.4s var(--ease-out-cubic),
+    transform 0.4s var(--ease-out-cubic),
+    box-shadow 0.4s var(--ease-out-cubic);
+  cursor: default;
+}
+
+.card:hover {
+  background: rgba(255, 255, 255, 0.03);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+  z-index: 1;
+  position: relative;
+}
+
+.cardIndex {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  color: rgba(255, 255, 255, 0.22);
+  margin-bottom: clamp(16px, 2.5vh, 24px);
+}
+
+.cardTitle {
+  font-size: clamp(18px, 1.8vw, 26px);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--paper);
+  margin-bottom: clamp(14px, 2vh, 20px);
+}
+
+.cardRule {
+  width: 24px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+  margin-bottom: clamp(14px, 2vh, 20px);
+  transition: width 0.4s var(--ease-out-cubic), background 0.4s;
+}
+
+.card:hover .cardRule {
+  width: 40px;
+  background: var(--amber);
+}
+
+.cardBody {
+  font-size: clamp(13px, 1vw, 15px);
+  font-weight: 400;
+  line-height: 1.72;
+  color: rgba(255, 255, 255, 0.38);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 720px) {
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .statItem {
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .statItem:last-child {
+    border-bottom: none;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
