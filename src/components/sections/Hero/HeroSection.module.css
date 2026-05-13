@@ -72,7 +72,7 @@
 .headline {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: clamp(48px, 9vw, 132px);
+  font-size: clamp(40px, 7vw, 100px);
   line-height: 0.92;
   letter-spacing: -0.04em;
   color: var(--paper);
@@ -122,6 +122,52 @@
 
 .cta:hover svg {
   transform: translateX(4px);
+}
+
+/* ---------- Left-side hero words ---------- */
+.heroSide {
+  position: absolute;
+  left: clamp(24px, 4vw, 56px);
+  bottom: clamp(72px, 12vh, 120px);
+  max-width: clamp(180px, 18vw, 280px);
+  opacity: 0;
+  will-change: opacity;
+}
+
+.heroSideLabel {
+  font-family: var(--font-display);
+  font-size: clamp(9px, 0.65vw, 11px);
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-indent: 0.32em;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  margin-bottom: clamp(10px, 1.8vh, 18px);
+}
+
+.heroSideText {
+  font-family: var(--font-display);
+  font-size: clamp(18px, 2vw, 28px);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--paper);
+  margin-bottom: clamp(12px, 2vh, 20px);
+}
+
+.heroSideLine {
+  width: 32px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.35);
+  margin-bottom: clamp(10px, 1.6vh, 16px);
+}
+
+.heroSideDesc {
+  font-family: var(--font-display);
+  font-size: clamp(10px, 0.72vw, 12px);
+  font-weight: 400;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.42);
 }
 
 /* ---------- Scroll hint ---------- */
@@ -231,23 +277,57 @@
   z-index: 5;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: clamp(12px, 2.5vh, 28px);
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: 0;
   pointer-events: none;
-  padding: clamp(24px, 5vw, 64px);
+  padding: clamp(48px, 9vh, 110px) clamp(28px, 5.5vw, 80px) clamp(120px, 20vh, 180px);
 }
 
-.epilogueLine {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: clamp(24px, 4vw, 60px);
-  letter-spacing: 0.08em;
-  text-indent: 0.08em;
-  color: var(--paper);
-  text-shadow: 0 2px 32px rgba(0, 0, 0, 0.45);
+/* Shared base — JS controls opacity + translateY */
+.epilogueLineBase {
+  display: block;
+  line-height: 0.92;
   opacity: 0;
   will-change: transform, opacity;
+}
+
+/* Line A — Cormorant Garamond, thin italic, left */
+.epilogueLineA {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(52px, 8.5vw, 124px);
+  letter-spacing: 0.01em;
+  color: rgba(255, 255, 255, 0.82);
+  text-align: left;
+  text-shadow: 0 2px 40px rgba(0, 0, 0, 0.4);
+  margin-bottom: clamp(4px, 0.8vh, 10px);
+}
+
+/* Line B — Inter Tight bold, right, pushed to bottom with auto margin */
+.epilogueLineB {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(56px, 9.5vw, 144px);
+  letter-spacing: -0.03em;
+  color: rgba(255, 255, 255, 1);
+  text-align: right;
+  text-shadow: 0 2px 40px rgba(0, 0, 0, 0.45);
+  margin-top: auto;
+  margin-bottom: clamp(14px, 2vh, 28px);
+}
+
+/* Line C — small tracked caption, centered */
+.epilogueLineC {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(10px, 0.85vw, 13px);
+  letter-spacing: 0.38em;
+  text-indent: 0.38em;
+  color: rgba(255, 255, 255, 0.48);
+  text-align: center;
+  text-transform: lowercase;
 }
 
 /* ---------- Bottom gradient — bleeds canvas into next section ---------- */
@@ -256,12 +336,22 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 70vh;
+  height: 100vh;
   z-index: 3;
-  background: linear-gradient(to bottom, transparent 0%, var(--ink) 100%);
+  background: linear-gradient(
+    to top,
+    rgba(10, 13, 18, 1)    0%,
+    rgba(10, 13, 18, 0.96) 12%,
+    rgba(10, 13, 18, 0.75) 32%,
+    rgba(10, 13, 18, 0.38) 55%,
+    rgba(10, 13, 18, 0.10) 75%,
+    rgba(10, 13, 18, 0)    100%
+  );
   pointer-events: none;
   opacity: 0;
-  will-change: opacity;
+  transform: scaleY(0);
+  transform-origin: bottom center;
+  will-change: opacity, transform;
 }
 
 @media (prefers-reduced-motion: reduce) {

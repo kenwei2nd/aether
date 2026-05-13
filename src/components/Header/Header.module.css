@@ -1,0 +1,77 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: clamp(22px, 3.2vh, 40px) clamp(32px, 5vw, 72px);
+  font-family: var(--font-display);
+  color: var(--paper);
+  pointer-events: none;
+  /* Fades out on scroll — JS sets opacity */
+  will-change: opacity;
+  transition: opacity 0.5s ease;
+}
+
+.header > * { pointer-events: auto; }
+
+/* ── Left — nav links ───────────────────────────────────── */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(24px, 3vw, 44px);
+}
+
+.navLink {
+  font-size: clamp(14px, 1vw, 16px);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.82);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.navLink:hover { color: var(--paper); }
+
+/* ── Center — wordmark ──────────────────────────────────── */
+.logo {
+  font-size: clamp(14px, 1.1vw, 18px);
+  font-weight: 600;
+  letter-spacing: 0.44em;
+  text-indent: 0.44em;
+  color: var(--paper);
+  text-decoration: none;
+  justify-self: center;
+}
+
+/* ── Right — contact ────────────────────────────────────── */
+.contact {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: clamp(20px, 2.5vw, 36px);
+}
+
+.contactLink {
+  font-size: clamp(13px, 0.9vw, 15px);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.62);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.contactLink:hover { color: var(--paper); }
+
+@media (max-width: 768px) {
+  .header { grid-template-columns: 1fr auto; }
+  .contact { display: none; }
+  .nav     { gap: clamp(16px, 4vw, 28px); }
+}
+
+@media (max-width: 480px) {
+  .nav { display: none; }
+}

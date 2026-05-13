@@ -2,27 +2,28 @@ import { useEffect, useRef } from 'react'
 import useHeroProgress from '@store/useHeroProgress'
 import styles from './HeroSection.module.css'
 
+/* First ~28% of epilogue is static (no animation) — gives ~1 scroll
+   of "hold" before text starts appearing.                           */
 const LINES = [
-  { text: 'WHERE SILENCE MEETS THE SKY', start: 0.05, end: 0.20 },
-  { text: 'YOUR JOURNEY BEGINS',         start: 0.25, end: 0.40 },
-  { text: 'ABOVE THE ORDINARY',          start: 0.45, end: 0.60 },
+  { text: 'Where silence',                           start: 0.28, end: 0.42, cls: styles.epilogueLineA },
+  { text: 'meets the sky.',                          start: 0.40, end: 0.55, cls: styles.epilogueLineB },
+  { text: 'your journey begins above the ordinary',  start: 0.58, end: 0.72, cls: styles.epilogueLineC },
 ]
 
 const clamp01 = (v) => Math.min(1, Math.max(0, v))
 const easeOut = (t) => 1 - Math.pow(1 - t, 3)
 
 export default function EpilogueCopy() {
-  const refs = [useRef(null), useRef(null), useRef(null)]
+  const refs = useRef([])
 
   useEffect(() => {
     const apply = (ep) => {
       LINES.forEach(({ start, end }, i) => {
-        const el = refs[i].current
+        const el = refs.current[i]
         if (!el) return
-        const range = end - start
-        const t = easeOut(clamp01((ep - start) / range))
+        const t = easeOut(clamp01((ep - start) / (end - start)))
         el.style.opacity = String(t)
-        el.style.transform = `translateY(${(1 - t) * 20}px)`
+        el.style.transform = `translateY(${(1 - t) * 22}px)`
       })
     }
 
@@ -37,8 +38,12 @@ export default function EpilogueCopy() {
 
   return (
     <div className={styles.epilogueCopy} aria-hidden="true">
-      {LINES.map(({ text }, i) => (
-        <span key={text} ref={refs[i]} className={styles.epilogueLine}>
+      {LINES.map(({ text, cls }, i) => (
+        <span
+          key={text}
+          ref={(el) => { refs.current[i] = el }}
+          className={`${styles.epilogueLineBase} ${cls}`}
+        >
           {text}
         </span>
       ))}

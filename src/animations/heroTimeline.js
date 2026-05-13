@@ -16,9 +16,8 @@ const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3)
  *  0.85 – 1.00  Final reveal — CTA fades in over the popped-out screen frame
  */
 export function readOverlayState(p) {
-  // Hero copy: visible at the very start, gone before window dive.
-  const heroOpacity =
-    easeOutCubic(clamp01(p / 0.10)) * (1 - clamp01((p - 0.10) / 0.10))
+  // Hero copy: fully visible on the first frame, fades out before window dive.
+  const heroOpacity = 1 - clamp01((p - 0.10) / 0.10)
 
   // Tagline: floats in during the open-sky beat.
   const taglineOpacity = bell(p, 0.30, 0.45, 0.05)

@@ -27,7 +27,10 @@ export default function HeroSection() {
     if (reduced) {
       useHeroProgress.setState({ progress: 1, epilogueProgress: 1 })
       canvasApiRef.current?.setProgress(1)
-      if (gradientRef.current) gradientRef.current.style.opacity = '1'
+      if (gradientRef.current) {
+        gradientRef.current.style.opacity = '1'
+        gradientRef.current.style.transform = 'scaleY(1)'
+      }
       return
     }
 
@@ -46,7 +49,9 @@ export default function HeroSection() {
           useHeroProgress.setState({ progress: frameP, epilogueProgress: epilogueP })
           canvasApiRef.current?.setProgress(frameP)
           if (gradientRef.current) {
-            gradientRef.current.style.opacity = String(clamp01((epilogueP - 0.3) / 0.55))
+            const riseP = clamp01((epilogueP - 0.75) / 0.25)
+            gradientRef.current.style.opacity = String(Math.min(0.72, riseP * 1.4))
+            gradientRef.current.style.transform = `scaleY(${riseP})`
           }
         },
       })

@@ -6,9 +6,12 @@
 
 .dark {
   position: relative;
+  margin-top: -2px;
   background: linear-gradient(
     to bottom,
     var(--ink) 0%,
+    #0a0f1e 10%,
+    #070d18 22%,
     #060c16 50%,
     #030608 100%
   );
@@ -25,9 +28,31 @@
   height: 100%;
   pointer-events: none;
   z-index: 0;
-  /* Stars invisible at top (About area), fade in toward Globe */
-  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 35%, black 55%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 35%, black 55%);
+  /* Brief soft top so stars don't bleed into hero seam, then visible everywhere */
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.55) 4%, black 14%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.55) 4%, black 14%);
+}
+
+/* ── Entry buffer — sky × space hybrid before content ─────── */
+.entryBuffer {
+  height: 65vh;
+  position: relative;
+}
+
+.entryBuffer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 55% 18% at 25% 12%, rgba(140,190,230,0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 65% 22% at 72%  6%, rgba(120,175,215,0.10) 0%, transparent 70%),
+    radial-gradient(ellipse 45% 15% at 50% 20%, rgba(160,205,240,0.08) 0%, transparent 70%),
+    linear-gradient(to bottom, rgba(14,32,64,0.65) 0%, rgba(9,22,40,0.35) 35%, transparent 75%);
+  /* Fade the entire overlay in from the top so the DarkSection top pixel
+     matches the hero's var(--ink) exactly — no colour pop at the seam. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 10%);
+  pointer-events: none;
 }
 
 /* ── About block ──────────────────────────────────────────── */
@@ -174,18 +199,34 @@
   background: var(--ink);
   padding: clamp(28px, 4vw, 48px);
   opacity: 0;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  border: none;
+  width: 100%;
+  display: block;
   transition:
     background 0.4s var(--ease-out-cubic),
-    transform 0.4s var(--ease-out-cubic),
-    box-shadow 0.4s var(--ease-out-cubic);
+    box-shadow 1s cubic-bezier(.23, 1, .32, 1);
 }
 
 .card:hover {
   background: rgba(255, 255, 255, 0.03);
-  transform: translateY(-4px);
+}
+
+.cardOpen {
+  background: rgba(255, 255, 255, 0.04);
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
   position: relative;
   z-index: 2;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: clamp(16px, 2.5vh, 24px);
 }
 
 .cardIndex {
@@ -194,7 +235,19 @@
   font-weight: 500;
   letter-spacing: 0.3em;
   color: rgba(255, 255, 255, 0.2);
-  margin-bottom: clamp(16px, 2.5vh, 24px);
+}
+
+.cardToggle {
+  font-size: 20px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.3);
+  line-height: 1;
+  transition: color 0.4s var(--ease-out-cubic), transform 0.5s cubic-bezier(.23, 1, .32, 1);
+}
+
+.cardOpen .cardToggle {
+  color: var(--amber);
+  transform: rotate(180deg);
 }
 
 .cardTitle {
@@ -210,20 +263,36 @@
   width: 24px;
   height: 1px;
   background: rgba(255, 255, 255, 0.18);
-  margin-bottom: clamp(14px, 2vh, 20px);
-  transition: width 0.4s var(--ease-out-cubic), background 0.4s;
+  transition: width 1s cubic-bezier(.23, 1, .32, 1), background 0.6s;
 }
 
 .card:hover .cardRule {
-  width: 40px;
+  width: 32px;
+}
+
+.cardOpen .cardRule {
+  width: 56px;
   background: var(--amber);
+}
+
+.cardBodyWrap {
+  max-height: 0;
+  overflow: hidden;
+  transition:
+    max-height 1s cubic-bezier(.23, 1, .32, 1),
+    margin-top 1s cubic-bezier(.23, 1, .32, 1);
+}
+
+.cardOpen .cardBodyWrap {
+  max-height: 280px;
+  margin-top: clamp(14px, 2vh, 20px);
 }
 
 .cardBody {
   font-size: clamp(13px, 1vw, 15px);
   font-weight: 400;
   line-height: 1.72;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.55);
 }
 
 /* ── Globe block ──────────────────────────────────────────── */
@@ -233,38 +302,55 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: clamp(32px, 5vh, 64px) clamp(24px, 6vw, 80px) 0;
+  padding: 0;
+  overflow: hidden;
+  min-height: 100vh;
+  justify-content: center;
 }
 
-.globeText {
-  text-align: center;
-  max-width: 640px;
-  margin-bottom: clamp(16px, 3vh, 32px);
+/* Massive ghost words — Jesko Jets "Global" style, 4 stacked words */
+.globeBgTitle {
+  position: relative;
+  width: 100%;
+  z-index: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  padding-top: clamp(24px, 4vh, 56px);
+  /* heavy negative pull so globe overlaps the bottom words for 3D depth */
+  margin-bottom: clamp(-340px, -36vh, -200px);
 }
 
-.globeEyebrow {
-  font-size: clamp(10px, 0.8vw, 12px);
-  font-weight: 500;
-  letter-spacing: 0.44em;
-  text-indent: 0.44em;
-  color: rgba(106, 166, 255, 0.7);
-  margin-bottom: clamp(12px, 2vh, 20px);
+.globeBgWord {
+  font-family: var(--font-display);
+  font-size: clamp(48px, 10vw, 160px);
+  font-weight: 700;
+  line-height: 0.86;
+  letter-spacing: -0.05em;
+  color: rgba(255, 255, 255, 0.06);
+  white-space: nowrap;
+  display: block;
+  padding-left: clamp(16px, 3vw, 48px);
+  opacity: 0;
+  will-change: transform, opacity;
 }
 
-.globeHeadline {
-  font-size: clamp(44px, 7vw, 100px);
-  font-weight: 600;
-  line-height: 0.97;
-  letter-spacing: -0.04em;
-  color: var(--paper);
-  margin-bottom: clamp(14px, 2vh, 20px);
+.globeBgWordRight {
+  text-align: right;
+  padding-left: 0;
+  padding-right: clamp(16px, 3vw, 48px);
 }
 
 .globeSub {
-  font-size: clamp(13px, 1.1vw, 16px);
+  position: relative;
+  z-index: 1;
+  font-size: clamp(11px, 0.9vw, 14px);
   font-weight: 400;
-  letter-spacing: 0.04em;
-  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.25);
+  text-align: center;
+  margin-top: clamp(12px, 2vh, 20px);
+  padding-bottom: clamp(20px, 3vh, 40px);
 }
 
 .globeWrap {
@@ -274,6 +360,8 @@
   align-items: center;
   margin-top: clamp(-30px, -3vh, -10px);
   will-change: transform, opacity;
+  mask-image: radial-gradient(circle at center, black 60%, transparent 84%);
+  -webkit-mask-image: radial-gradient(circle at center, black 60%, transparent 84%);
 }
 
 .globePlaceholder {
@@ -285,12 +373,149 @@
   );
 }
 
-/* ── Bottom transition — ink → paper ─────────────────────── */
+/* ── Globe frame & ring ───────────────────────────────────── */
+.globeFrame {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.globeRing {
+  position: absolute;
+  width: min(72vmin, 820px);
+  height: min(72vmin, 820px);
+  border-radius: 50%;
+  border: 1px solid rgba(106, 166, 255, 0.07);
+  box-shadow:
+    0 0 70px rgba(30, 58, 138, 0.22),
+    0 0 140px rgba(30, 58, 138, 0.10),
+    inset 0 0 70px rgba(30, 58, 138, 0.08);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── City info overlay ────────────────────────────────────── */
+.cityOverlay {
+  position: absolute;
+  bottom: 16%;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s var(--ease-out-cubic);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 200px;
+}
+
+.cityOverlayVisible {
+  opacity: 1;
+}
+
+.cityOverlayName {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 3.5vw, 44px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--paper);
+}
+
+.cityOverlayCountry {
+  font-family: var(--font-display);
+  font-size: clamp(10px, 0.85vw, 12px);
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+}
+
+.cityCoords {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: clamp(9px, 0.7vw, 11px);
+  color: rgba(106, 166, 255, 0.5);
+  letter-spacing: 0.1em;
+}
+
+/* ── City switcher bar ────────────────────────────────────── */
+.cityBar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 1440px;
+  margin: clamp(24px, 4vh, 48px) auto 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.cityItem {
+  font-family: var(--font-display);
+  font-size: clamp(9px, 0.72vw, 11px);
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+  color: rgba(255, 255, 255, 0.28);
+  padding: 16px clamp(14px, 2vw, 32px);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  background: none;
+  border-top: none;
+  border-bottom: none;
+  border-left: none;
+  cursor: pointer;
+  white-space: nowrap;
+  text-transform: uppercase;
+  transition:
+    color 0.3s var(--ease-out-cubic),
+    background 0.3s var(--ease-out-cubic);
+}
+
+.cityItem:last-child {
+  border-right: none;
+}
+
+.cityItem:hover {
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.cityItemActive {
+  color: var(--amber) !important;
+  background: rgba(244, 177, 92, 0.06);
+}
+
+/* ── Bottom transition — ink → warm beige ────────────────────
+   All stops are the same warm beige (#f8f4ef) with only alpha
+   varying — prevents banding AND lands on the exact colour
+   ShowcaseSection's stage starts with, so there's no seam. */
 .bottomFade {
   position: relative;
   z-index: 2;
-  height: 32vh;
-  background: linear-gradient(to bottom, transparent 0%, var(--paper) 100%);
+  height: 80vh;
+  background: linear-gradient(
+    to bottom,
+    rgba(248, 244, 239, 0)    0%,
+    rgba(248, 244, 239, 0.01) 15%,
+    rgba(248, 244, 239, 0.04) 28%,
+    rgba(248, 244, 239, 0.10) 40%,
+    rgba(248, 244, 239, 0.22) 52%,
+    rgba(248, 244, 239, 0.40) 63%,
+    rgba(248, 244, 239, 0.60) 73%,
+    rgba(248, 244, 239, 0.78) 82%,
+    rgba(248, 244, 239, 0.92) 91%,
+    rgba(248, 244, 239, 1)    100%
+  );
   pointer-events: none;
 }
 

@@ -1,0 +1,190 @@
+/* ============================================================
+   Interior — pinned cabin reveal
+   White stage. Plane rises from below, zooms into 3 cabin zones.
+   Total scroll = 5 × 100vh; section is pinned the whole way.
+   ============================================================ */
+
+.interior {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-display);
+  position: relative;
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 70% 90% at 50% 50%, rgba(255,255,255,1) 0%, rgba(248,247,244,1) 100%);
+}
+
+/* ---------- Opening headline (visible only at start) ---------- */
+.headline {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
+  pointer-events: none;
+  text-align: center;
+  padding: 0 clamp(24px, 5vw, 64px);
+  will-change: transform, opacity;
+}
+
+.headlineEyebrow {
+  font-size: clamp(10px, 0.8vw, 12px);
+  font-weight: 500;
+  letter-spacing: 0.42em;
+  text-indent: 0.42em;
+  color: rgba(10, 13, 18, 0.4);
+  margin-bottom: clamp(20px, 3vh, 32px);
+}
+
+.headlineText {
+  font-size: clamp(40px, 7vw, 96px);
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  max-width: 16ch;
+}
+
+.headlineText em {
+  font-style: italic;
+  font-weight: 300;
+  color: rgba(10, 13, 18, 0.55);
+}
+
+/* ---------- Plane stack ---------- */
+.planeWrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, opacity;
+  transform-origin: center center;
+  z-index: 2;
+}
+
+.plane {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: clamp(420px, 78vh, 820px);
+  width: auto;
+  max-width: 90vw;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+  /* gentle drop shadow for depth on the white stage */
+  filter: drop-shadow(0 24px 48px rgba(10, 13, 18, 0.18));
+  will-change: opacity;
+}
+
+.planeBlueprint {
+  /* Blueprint version is paler, hint of cobalt */
+  filter: drop-shadow(0 12px 24px rgba(30, 58, 138, 0.18));
+}
+
+/* ---------- Zone copy panel (right-aligned) ---------- */
+.zoneCopy {
+  position: absolute;
+  right: clamp(24px, 6vw, 96px);
+  top: 50%;
+  transform: translateY(-50%);
+  max-width: 360px;
+  opacity: 0;
+  z-index: 5;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.zoneIndex {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: clamp(10px, 0.8vw, 12px);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--amber);
+  margin-bottom: clamp(10px, 1.5vh, 16px);
+}
+
+.zoneLabel {
+  font-size: clamp(24px, 3.2vw, 40px);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  margin-bottom: clamp(14px, 2vh, 22px);
+}
+
+.zoneText {
+  font-size: clamp(14px, 1.05vw, 17px);
+  font-weight: 400;
+  line-height: 1.68;
+  color: rgba(10, 13, 18, 0.62);
+}
+
+/* ---------- Progress dots (left edge) ---------- */
+.zoneNav {
+  position: absolute;
+  left: clamp(20px, 3vw, 40px);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  z-index: 5;
+}
+
+.zoneDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(10, 13, 18, 0.18);
+  transition:
+    background 0.4s var(--ease-out-cubic),
+    transform 0.4s var(--ease-out-cubic),
+    width 0.4s var(--ease-out-cubic);
+}
+
+.zoneDotActive {
+  background: var(--amber);
+  transform: scale(1.6);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .zoneCopy {
+    right: clamp(16px, 5vw, 32px);
+    max-width: 60vw;
+  }
+  .plane {
+    height: clamp(320px, 60vh, 600px);
+  }
+}
+
+@media (max-width: 640px) {
+  .zoneCopy {
+    right: 50%;
+    transform: translate(50%, 0);
+    top: auto;
+    bottom: clamp(24px, 8vh, 64px);
+    max-width: 86vw;
+    text-align: center;
+  }
+  .zoneNav {
+    flex-direction: row;
+    left: 50%;
+    top: clamp(24px, 6vh, 56px);
+    transform: translateX(-50%);
+  }
+  .headlineText {
+    font-size: clamp(32px, 9vw, 56px);
+  }
+}

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, lazy, Suspense, useCallback } from 'react'
+import * as THREE from 'three'
 import { feature } from 'topojson-client'
 import { gsap } from '@animations/gsap.config'
 import styles from './DarkSection.module.css'
@@ -29,28 +30,28 @@ const CARDS = [
 const MARQUEE_TEXT = 'QUIET ALTITUDE  ·  ZERO COMPROMISE  ·  PRIVATE AVIATION  ·  GLOBAL REACH  ·  BESPOKE JOURNEYS  ·  '
 
 const ARCS = [
-  { startLat: 25.2, startLng: 55.3,  endLat: 51.5,  endLng: -0.1,   color: ['#ffffff', '#f4b15c'] },
-  { startLat: 25.2, startLng: 55.3,  endLat: 40.7,  endLng: -74.0,  color: ['#6aa6ff', '#ffffff'] },
-  { startLat: 25.2, startLng: 55.3,  endLat: 1.3,   endLng: 103.8,  color: ['#ffffff', '#f4b15c'] },
-  { startLat: 51.5, startLng: -0.1,  endLat: 40.7,  endLng: -74.0,  color: ['#6aa6ff', '#ffffff'] },
-  { startLat: 51.5, startLng: -0.1,  endLat: 35.7,  endLng: 139.7,  color: ['#ffffff', '#f4b15c'] },
-  { startLat: 40.7, startLng: -74.0, endLat: 34.0,  endLng: -118.2, color: ['#6aa6ff', '#ffffff'] },
-  { startLat: 48.9, startLng: 2.3,   endLat: 25.2,  endLng: 55.3,   color: ['#ffffff', '#f4b15c'] },
-  { startLat: 35.7, startLng: 139.7, endLat: -33.9, endLng: 151.2,  color: ['#6aa6ff', '#ffffff'] },
-  { startLat: 1.3,  startLng: 103.8, endLat: -33.9, endLng: 151.2,  color: ['#ffffff', '#f4b15c'] },
-  { startLat: 46.2, startLng: 6.1,   endLat: 40.7,  endLng: -74.0,  color: ['#6aa6ff', '#ffffff'] },
+  { startLat: 25.2, startLng: 55.3,  endLat: 51.5,  endLng: -0.1,   color: ['#ffffff', '#ffffff'] },
+  { startLat: 25.2, startLng: 55.3,  endLat: 40.7,  endLng: -74.0,  color: ['#ffffff', '#ffffff'] },
+  { startLat: 25.2, startLng: 55.3,  endLat: 1.3,   endLng: 103.8,  color: ['#ffffff', '#ffffff'] },
+  { startLat: 51.5, startLng: -0.1,  endLat: 40.7,  endLng: -74.0,  color: ['#ffffff', '#ffffff'] },
+  { startLat: 51.5, startLng: -0.1,  endLat: 35.7,  endLng: 139.7,  color: ['#ffffff', '#ffffff'] },
+  { startLat: 40.7, startLng: -74.0, endLat: 34.0,  endLng: -118.2, color: ['#ffffff', '#ffffff'] },
+  { startLat: 48.9, startLng: 2.3,   endLat: 25.2,  endLng: 55.3,   color: ['#ffffff', '#ffffff'] },
+  { startLat: 35.7, startLng: 139.7, endLat: -33.9, endLng: 151.2,  color: ['#ffffff', '#ffffff'] },
+  { startLat: 1.3,  startLng: 103.8, endLat: -33.9, endLng: 151.2,  color: ['#ffffff', '#ffffff'] },
+  { startLat: 46.2, startLng: 6.1,   endLat: 40.7,  endLng: -74.0,  color: ['#ffffff', '#ffffff'] },
 ]
 
 const CITIES = [
-  { lat: 25.2,  lng: 55.3,   name: 'Dubai' },
-  { lat: 51.5,  lng: -0.1,   name: 'London' },
-  { lat: 40.7,  lng: -74.0,  name: 'New York' },
-  { lat: 1.3,   lng: 103.8,  name: 'Singapore' },
-  { lat: 35.7,  lng: 139.7,  name: 'Tokyo' },
-  { lat: 48.9,  lng: 2.3,    name: 'Paris' },
-  { lat: 46.2,  lng: 6.1,    name: 'Geneva' },
-  { lat: 34.0,  lng: -118.2, name: 'Los Angeles' },
-  { lat: -33.9, lng: 151.2,  name: 'Sydney' },
+  { lat: 25.2,  lng: 55.3,   name: 'Dubai',       country: 'UAE' },
+  { lat: 51.5,  lng: -0.1,   name: 'London',      country: 'United Kingdom' },
+  { lat: 40.7,  lng: -74.0,  name: 'New York',    country: 'United States' },
+  { lat: 1.3,   lng: 103.8,  name: 'Singapore',   country: 'Singapore' },
+  { lat: 35.7,  lng: 139.7,  name: 'Tokyo',       country: 'Japan' },
+  { lat: 48.9,  lng: 2.3,    name: 'Paris',       country: 'France' },
+  { lat: 46.2,  lng: 6.1,    name: 'Geneva',      country: 'Switzerland' },
+  { lat: 34.0,  lng: -118.2, name: 'Los Angeles', country: 'United States' },
+  { lat: -33.9, lng: 151.2,  name: 'Sydney',      country: 'Australia' },
 ]
 
 const OCEAN_IMG = (() => {
@@ -58,10 +59,57 @@ const OCEAN_IMG = (() => {
   const c = document.createElement('canvas')
   c.width = 2; c.height = 2
   const ctx = c.getContext('2d')
-  ctx.fillStyle = '#0a1728'
+  ctx.fillStyle = '#07111f'
   ctx.fillRect(0, 0, 2, 2)
   return c.toDataURL()
 })()
+
+/* ── Plane helpers ───────────────────────────────────────────── */
+function interpGreatCircle(lat1, lng1, lat2, lng2, t) {
+  const toR = d => d * Math.PI / 180
+  const toD = r => r * 180 / Math.PI
+  const [r1, g1] = [toR(lat1), toR(lng1)]
+  const [r2, g2] = [toR(lat2), toR(lng2)]
+  const [x1, y1, z1] = [Math.cos(r1)*Math.cos(g1), Math.cos(r1)*Math.sin(g1), Math.sin(r1)]
+  const [x2, y2, z2] = [Math.cos(r2)*Math.cos(g2), Math.cos(r2)*Math.sin(g2), Math.sin(r2)]
+  const dot = Math.max(-1, Math.min(1, x1*x2 + y1*y2 + z1*z2))
+  const ang = Math.acos(dot)
+  if (ang < 1e-6) return { lat: lat1, lng: lng1 }
+  const sa = Math.sin(ang)
+  const s1 = Math.sin((1 - t) * ang) / sa
+  const s2 = Math.sin(t * ang) / sa
+  const [x, y, z] = [s1*x1 + s2*x2, s1*y1 + s2*y2, s1*z1 + s2*z2]
+  return { lat: toD(Math.asin(z)), lng: toD(Math.atan2(y, x)) }
+}
+
+function makePlaneCanvas() {
+  const s = 96, m = s / 2
+  const c = document.createElement('canvas')
+  c.width = s; c.height = s
+  const ctx = c.getContext('2d')
+  ctx.fillStyle = '#ffffff'
+  // Body
+  ctx.beginPath()
+  ctx.ellipse(m, m - 6, 4, 24, 0, 0, Math.PI * 2)
+  ctx.fill()
+  // Main wings
+  ctx.beginPath()
+  ctx.moveTo(m - 30, m + 4)
+  ctx.lineTo(m + 30, m + 4)
+  ctx.lineTo(m + 6, m + 16)
+  ctx.lineTo(m - 6, m + 16)
+  ctx.closePath()
+  ctx.fill()
+  // Tail
+  ctx.beginPath()
+  ctx.moveTo(m - 14, m + 20)
+  ctx.lineTo(m + 14, m + 20)
+  ctx.lineTo(m + 5, m + 30)
+  ctx.lineTo(m - 5, m + 30)
+  ctx.closePath()
+  ctx.fill()
+  return c
+}
 
 /* ── Starfield canvas ────────────────────────────────────────── */
 function Starfield({ sectionHeight }) {
@@ -80,27 +128,26 @@ function Starfield({ sectionHeight }) {
 
     const rand = (min, max) => Math.random() * (max - min) + min
 
-    // Background stars — concentrated in lower 60% (globe area)
-    for (let i = 0; i < 400; i++) {
-      // Bias star placement toward the lower portion
-      const yBias = Math.pow(Math.random(), 0.6)
+    // Background stars — fully uniform distribution for density throughout
+    for (let i = 0; i < 1000; i++) {
+      const yBias = Math.random()
       const x = rand(0, w)
       const y = yBias * h
-      const r = rand(0.2, 1.2)
-      const a = rand(0.1, 0.8) * (0.2 + yBias * 0.8) // dimmer at top
+      const r = rand(0.2, 1.3)
+      const a = rand(0.25, 0.9) * (0.75 + yBias * 0.25)
       ctx.beginPath()
       ctx.arc(x, y, r, 0, Math.PI * 2)
       ctx.fillStyle = `rgba(255,255,255,${a})`
       ctx.fill()
     }
 
-    // Glowing stars
-    for (let i = 0; i < 35; i++) {
-      const yBias = Math.pow(Math.random(), 0.5)
+    // Glowing stars — uniform for visible sparkle throughout
+    for (let i = 0; i < 80; i++) {
+      const yBias = Math.random()
       const x = rand(0, w)
       const y = yBias * h
-      const r = rand(1.0, 2.6)
-      const a = rand(0.08, 0.4) * (0.1 + yBias * 0.9)
+      const r = rand(1.0, 2.8)
+      const a = rand(0.18, 0.55) * (0.65 + yBias * 0.35)
       const grd = ctx.createRadialGradient(x, y, 0, x, y, r * 4)
       grd.addColorStop(0, `rgba(180,210,255,${a})`)
       grd.addColorStop(1, 'transparent')
@@ -142,14 +189,19 @@ export default function DarkSection() {
   const bodyRef      = useRef(null)
   const statsRef     = useRef(null)
   const cardsRef     = useRef(null)
-  const globeTextRef = useRef(null)
+  const bgTitleRef   = useRef(null)
   const globeWrapRef = useRef(null)
-  const globeRef     = useRef(null)
-  const counterRefs  = useRef([])
+  const globeRef        = useRef(null)
+  const counterRefs     = useRef([])
+  const planeCleanupRef = useRef(null)
 
-  const [mounted, setMounted]       = useState(false)
-  const [globeSize, setGlobeSize]   = useState(700)
-  const [sectionH, setSectionH]     = useState(0)
+  const [mounted, setMounted]           = useState(false)
+  const [globeSize, setGlobeSize]       = useState(700)
+  const [sectionH, setSectionH]         = useState(0)
+  const [expandedCard, setExpandedCard] = useState(null)
+  const [activeCity, setActiveCity]     = useState(null)
+  const ctrlRef         = useRef(null)
+  const autoRotateTimer = useRef(null)
 
   // Lazy-mount globe when near viewport
   useEffect(() => {
@@ -161,10 +213,10 @@ export default function DarkSection() {
     return () => obs.disconnect()
   }, [])
 
-  // Globe size = viewport width (immersive full-width)
+  // Globe size — sized to fit alongside bg title + city bar in one viewport
   useEffect(() => {
     const calc = () => {
-      setGlobeSize(Math.round(Math.min(window.innerWidth, window.innerHeight) * 1.1))
+      setGlobeSize(Math.round(Math.min(window.innerWidth, window.innerHeight) * 0.85))
     }
     calc()
     window.addEventListener('resize', calc)
@@ -178,15 +230,103 @@ export default function DarkSection() {
     return () => ro.disconnect()
   }, [])
 
-  // Globe init: auto-rotate, initial POV
+  // Globe init: auto-rotate, initial POV, plane animation
   const onGlobeReady = useCallback(() => {
     if (!globeRef.current) return
     const ctrl = globeRef.current.controls()
-    ctrl.autoRotate = true
-    ctrl.autoRotateSpeed = 0.55
+    ctrl.autoRotate = false
+    ctrl.enableDamping = true
+    ctrl.dampingFactor = 0.08
     ctrl.enableZoom = false
     ctrl.enablePan = false
     globeRef.current.pointOfView({ lat: 28, lng: 28, altitude: 2.0 })
+    ctrlRef.current = ctrl
+
+    // Animated plane (Dubai → London great-circle route)
+    const scene = globeRef.current.scene()
+    const texture = new THREE.CanvasTexture(makePlaneCanvas())
+    const sprite = new THREE.Sprite(
+      new THREE.SpriteMaterial({ map: texture, transparent: true, depthWrite: false })
+    )
+    sprite.scale.set(6, 6, 1)
+    scene.add(sprite)
+
+    const LOOP = 16000 // ms per Dubai→London traversal
+    let animId
+    const tick = () => {
+      const t = (Date.now() % LOOP) / LOOP
+      const { lat, lng } = interpGreatCircle(25.2, 55.3, 51.5, -0.1, t)
+      const alt = Math.sin(Math.PI * t) * 0.38
+      const g = globeRef.current
+      if (g) {
+        const coords = g.getCoords(lat, lng, alt)
+        sprite.position.set(coords.x, coords.y, coords.z)
+      }
+      animId = requestAnimationFrame(tick)
+    }
+    animId = requestAnimationFrame(tick)
+
+    planeCleanupRef.current = () => {
+      cancelAnimationFrame(animId)
+      scene.remove(sprite)
+      texture.dispose()
+    }
+  }, [])
+
+  // Cleanup plane animation and city cycle on unmount
+  useEffect(() => () => {
+    planeCleanupRef.current?.()
+    clearInterval(autoRotateTimer.current)
+  }, [])
+
+  // Auto-cycle through cities once globe is mounted
+  useEffect(() => {
+    if (!mounted) return
+    let idx = 0
+    const flyTo = () => {
+      setActiveCity(null)
+      setTimeout(() => {
+        setActiveCity(idx)
+        if (globeRef.current) {
+          globeRef.current.pointOfView(
+            { lat: CITIES[idx].lat, lng: CITIES[idx].lng, altitude: 1.8 },
+            1200
+          )
+        }
+        idx = (idx + 1) % CITIES.length
+      }, 350)
+    }
+    const startDelay = setTimeout(() => {
+      flyTo()
+      autoRotateTimer.current = setInterval(flyTo, 3800)
+    }, 1800)
+    return () => {
+      clearTimeout(startDelay)
+      clearInterval(autoRotateTimer.current)
+    }
+  }, [mounted])
+
+  const handleCitySelect = useCallback((idx) => {
+    clearInterval(autoRotateTimer.current)
+    setActiveCity(idx)
+    if (globeRef.current) {
+      globeRef.current.pointOfView({ lat: CITIES[idx].lat, lng: CITIES[idx].lng, altitude: 1.8 }, 1200)
+    }
+    // Restart auto-cycle from the next city after a pause
+    let currentIdx = (idx + 1) % CITIES.length
+    autoRotateTimer.current = setInterval(() => {
+      setActiveCity(null)
+      setTimeout(() => {
+        setActiveCity(currentIdx)
+        if (globeRef.current) {
+          globeRef.current.pointOfView(
+            { lat: CITIES[currentIdx].lat, lng: CITIES[currentIdx].lng, altitude: 1.8 },
+            1200
+          )
+        }
+        currentIdx = (currentIdx + 1) % CITIES.length
+      }, 350)
+    }, 3800)
   }, [])
 
   // All scroll animations
@@ -198,8 +338,8 @@ export default function DarkSection() {
       // Eyebrow
       gsap.fromTo(eyebrowRef.current,
         { opacity: 0, y: 12 },
-        { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out',
-          scrollTrigger: { trigger: eyebrowRef.current, start: 'top 90%', once: true } }
+        { opacity: 1, y: 0, ease: 'power2.out',
+          scrollTrigger: { trigger: eyebrowRef.current, start: 'top 92%', end: 'top 55%', scrub: 0.8 } }
       )
 
       // Headline — scrubbed opacity reveal
@@ -222,8 +362,8 @@ export default function DarkSection() {
       if (words?.length) {
         gsap.fromTo(words,
           { opacity: 0 },
-          { opacity: 1, duration: 0.4, ease: 'power1.out', stagger: 0.016,
-            scrollTrigger: { trigger: bodyRef.current, start: 'top 85%', once: true } }
+          { opacity: 1, ease: 'power1.out', stagger: 0.016,
+            scrollTrigger: { trigger: bodyRef.current, start: 'top 88%', end: 'bottom 55%', scrub: 1 } }
         )
       }
 
@@ -233,9 +373,9 @@ export default function DarkSection() {
         if (!el) return
         const obj = { val: 0 }
         gsap.to(obj, {
-          val: target, duration: 2, ease: 'power2.out',
+          val: target, ease: 'power1.inOut',
           onUpdate: () => { el.textContent = Math.round(obj.val).toLocaleString() + suffix },
-          scrollTrigger: { trigger: statsRef.current, start: 'top 85%', once: true },
+          scrollTrigger: { trigger: statsRef.current, start: 'top 85%', end: 'top 30%', scrub: 1 },
         })
       })
 
@@ -244,24 +384,34 @@ export default function DarkSection() {
         Array.from(cardsRef.current.children).forEach((card, i) => {
           gsap.fromTo(card,
             { opacity: 0, x: (i % 2 === 0 ? -1 : 1) * 48 },
-            { opacity: 1, x: 0, duration: 0.65, ease: 'power2.out',
-              scrollTrigger: { trigger: card, start: 'top 88%', once: true } }
+            { opacity: 1, x: 0, ease: 'power2.out',
+              scrollTrigger: { trigger: card, start: 'top 92%', end: 'top 40%', scrub: 0.9 } }
           )
         })
       }
 
-      // Globe text
-      gsap.fromTo(globeTextRef.current,
-        { opacity: 0, y: 32 },
-        { opacity: 1, y: 0, duration: 0.9, ease: 'power2.out',
-          scrollTrigger: { trigger: globeTextRef.current, start: 'top 85%', once: true } }
-      )
+      // Massive background title words — start revealing while still in cards section
+      const bgWords = bgTitleRef.current?.querySelectorAll(`.${styles.globeBgWord}`)
+      if (bgWords?.length) {
+        gsap.fromTo(bgWords,
+          { opacity: 0, y: 80 },
+          {
+            opacity: 1, y: 0, ease: 'power2.out', stagger: 0.15,
+            scrollTrigger: {
+              trigger: cardsRef.current,
+              start: 'bottom 85%',
+              end: 'bottom 20%',
+              scrub: 1.5,
+            },
+          }
+        )
+      }
 
       // Globe scale in
       gsap.fromTo(globeWrapRef.current,
         { opacity: 0, scale: 0.9 },
-        { opacity: 1, scale: 1, duration: 1.1, ease: 'power2.out',
-          scrollTrigger: { trigger: globeWrapRef.current, start: 'top 85%', once: true } }
+        { opacity: 1, scale: 1, ease: 'power2.out',
+          scrollTrigger: { trigger: globeWrapRef.current, start: 'top 90%', end: 'top 25%', scrub: 1 } }
       )
     }, section)
 
@@ -273,6 +423,9 @@ export default function DarkSection() {
 
       {/* Starfield — absolute, behind everything, masked at top */}
       <Starfield sectionHeight={sectionH} />
+
+      {/* Brief space buffer before content — lets stars breathe */}
+      <div className={styles.entryBuffer} aria-hidden="true" />
 
       {/* ── ABOUT BLOCK ─────────────────────────────────────── */}
       <div className={styles.aboutBlock}>
@@ -312,85 +465,135 @@ export default function DarkSection() {
         </div>
       </div>
 
-      {/* Cards */}
+      {/* Cards — click to expand */}
       <div className={styles.cardsWrap}>
         <div ref={cardsRef} className={styles.grid}>
-          {CARDS.map(({ index, title, body }) => (
-            <div key={index} className={styles.card}>
-              <span className={styles.cardIndex}>{index}</span>
-              <h3 className={styles.cardTitle}>
-                {title.split('\n').map((line, i, arr) => (
-                  <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
-                ))}
-              </h3>
-              <div className={styles.cardRule} />
-              <p className={styles.cardBody}>{body}</p>
-            </div>
-          ))}
+          {CARDS.map(({ index, title, body }) => {
+            const isOpen = expandedCard === index
+            return (
+              <button
+                key={index}
+                type="button"
+                className={`${styles.card} ${isOpen ? styles.cardOpen : ''}`}
+                onClick={() => setExpandedCard(isOpen ? null : index)}
+                aria-expanded={isOpen}
+              >
+                <div className={styles.cardHeader}>
+                  <span className={styles.cardIndex}>{index}</span>
+                  <span className={styles.cardToggle} aria-hidden="true">
+                    {isOpen ? '×' : '+'}
+                  </span>
+                </div>
+                <h3 className={styles.cardTitle}>
+                  {title.split('\n').map((line, i, arr) => (
+                    <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
+                  ))}
+                </h3>
+                <div className={styles.cardRule} />
+                <div className={styles.cardBodyWrap}>
+                  <p className={styles.cardBody}>{body}</p>
+                </div>
+              </button>
+            )
+          })}
         </div>
       </div>
 
       {/* ── GLOBE BLOCK ─────────────────────────────────────── */}
       <div className={styles.globeBlock}>
 
-        <div ref={globeTextRef} className={styles.globeText} style={{ opacity: 0 }}>
-          <p className={styles.globeEyebrow}>GLOBAL NETWORK</p>
-          <h2 className={styles.globeHeadline}>
-            Your world<br />without limits.
-          </h2>
-          <p className={styles.globeSub}>150+ destinations · Every continent · On demand</p>
+        {/* Massive background words — Jesko Jets style, behind the globe */}
+        <div ref={bgTitleRef} className={styles.globeBgTitle} aria-hidden="true">
+          <span className={styles.globeBgWord}>YOUR</span>
+          <span className={`${styles.globeBgWord} ${styles.globeBgWordRight}`}>WORLD</span>
+          <span className={styles.globeBgWord}>WITHOUT</span>
+          <span className={`${styles.globeBgWord} ${styles.globeBgWordRight}`}>LIMITS</span>
         </div>
 
-        <div ref={globeWrapRef} className={styles.globeWrap} style={{ opacity: 0 }}>
-          <Suspense fallback={
-            <div className={styles.globePlaceholder} style={{ width: globeSize, height: globeSize }} />
-          }>
-            {mounted && (
-              <Globe
-                ref={globeRef}
-                width={globeSize}
-                height={globeSize}
-                onGlobeReady={onGlobeReady}
-                backgroundColor="rgba(0,0,0,0)"
-                globeImageUrl={OCEAN_IMG}
-                atmosphereColor="#6aa6ff"
-                atmosphereAltitude={0.22}
-                showAtmosphere
-                polygonsData={COUNTRIES}
-                polygonCapColor={() => '#1c2a3a'}
-                polygonSideColor={() => '#0f1a28'}
-                polygonStrokeColor={() => 'rgba(100,166,255,0.12)'}
-                polygonAltitude={0.008}
-                arcsData={ARCS}
-                arcStartLat="startLat"
-                arcStartLng="startLng"
-                arcEndLat="endLat"
-                arcEndLng="endLng"
-                arcColor="color"
-                arcAltitude={0.35}
-                arcStroke={0.7}
-                arcDashLength={0.45}
-                arcDashGap={0.2}
-                arcDashAnimateTime={2600}
-                pointsData={CITIES}
-                pointLat="lat"
-                pointLng="lng"
-                pointColor={() => '#f4b15c'}
-                pointAltitude={0.015}
-                pointRadius={0.5}
-                pointResolution={8}
-                ringsData={CITIES}
-                ringLat="lat"
-                ringLng="lng"
-                ringColor={() => (t) => `rgba(244,177,92,${1 - t})`}
-                ringMaxRadius={4}
-                ringPropagationSpeed={1.5}
-                ringRepeatPeriod={1200}
-                enablePointerInteraction
-              />
+        {/* Globe frame — ring + globe + city overlay */}
+        <div className={styles.globeFrame}>
+          <div className={styles.globeRing} aria-hidden="true" />
+
+          <div ref={globeWrapRef} className={styles.globeWrap} style={{ opacity: 0 }}>
+            <Suspense fallback={
+              <div className={styles.globePlaceholder} style={{ width: globeSize, height: globeSize }} />
+            }>
+              {mounted && (
+                <Globe
+                  ref={globeRef}
+                  width={globeSize}
+                  height={globeSize}
+                  onGlobeReady={onGlobeReady}
+                  backgroundColor="rgba(0,0,0,0)"
+                  globeImageUrl={OCEAN_IMG}
+                  showAtmosphere={false}
+                  polygonsData={COUNTRIES}
+                  polygonCapColor={() => '#0d1a28'}
+                  polygonSideColor={() => '#080f1a'}
+                  polygonStrokeColor={() => 'rgba(255,255,255,0.65)'}
+                  polygonAltitude={0.006}
+                  arcsData={ARCS}
+                  arcStartLat="startLat"
+                  arcStartLng="startLng"
+                  arcEndLat="endLat"
+                  arcEndLng="endLng"
+                  arcColor="color"
+                  arcAltitude={0.35}
+                  arcStroke={0.9}
+                  arcDashLength={0.45}
+                  arcDashGap={0.2}
+                  arcDashAnimateTime={2600}
+                  pointsData={CITIES}
+                  pointLat="lat"
+                  pointLng="lng"
+                  pointColor={() => '#ffffff'}
+                  pointAltitude={0.015}
+                  pointRadius={0.5}
+                  pointResolution={8}
+                  ringsData={CITIES}
+                  ringLat="lat"
+                  ringLng="lng"
+                  ringColor={() => (t) => `rgba(255,255,255,${1 - t})`}
+                  ringMaxRadius={4}
+                  ringPropagationSpeed={1.5}
+                  ringRepeatPeriod={1200}
+                  enablePointerInteraction
+                />
+              )}
+            </Suspense>
+          </div>
+
+          {/* City info — fades in when a city is selected */}
+          <div className={`${styles.cityOverlay} ${activeCity !== null ? styles.cityOverlayVisible : ''}`}>
+            {activeCity !== null && (
+              <>
+                <span className={styles.cityOverlayName}>{CITIES[activeCity].name}</span>
+                <span className={styles.cityOverlayCountry}>{CITIES[activeCity].country}</span>
+                <span className={styles.cityCoords}>
+                  {Math.abs(CITIES[activeCity].lat).toFixed(1)}°{CITIES[activeCity].lat >= 0 ? 'N' : 'S'}
+                  {' '}
+                  {Math.abs(CITIES[activeCity].lng).toFixed(1)}°{CITIES[activeCity].lng >= 0 ? 'E' : 'W'}
+                </span>
+              </>
             )}
-          </Suspense>
+          </div>
         </div>
+
+        {/* City switcher bar */}
+        <div className={styles.cityBar} role="group" aria-label="Select destination city">
+          {CITIES.map((city, idx) => (
+            <button
+              key={city.name}
+              type="button"
+              className={`${styles.cityItem} ${activeCity === idx ? styles.cityItemActive : ''}`}
+              onClick={() => handleCitySelect(idx)}
+            >
+              {city.name}
+            </button>
+          ))}
+        </div>
+
+        <p className={styles.globeSub}>150+ destinations · Every continent · On demand</p>
 
       </div>
 

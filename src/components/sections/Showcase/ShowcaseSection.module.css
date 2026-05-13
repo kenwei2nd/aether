@@ -1,200 +1,458 @@
 /* ============================================================
-   Aircraft Showcase Section
-   Layout: 3-column grid (headline-left | aircraft | model-right)
-   followed by a spec grid and CTA
+   ShowcaseSection — Pinned scroll animation
+   View 1: Split headline + plane render rises from below
+   View 2: Spec layout (blueprint in center, specs on sides)
+   Both views are absolute layers inside a single pinned stage.
    ============================================================ */
 
+/* ── Section wrapper ────────────────────────────────────────── */
+/* Tall section provides the scroll runway. The stage uses CSS
+   sticky to pin itself naturally — no GSAP pin-wrap, no layout
+   shift when engaging, Lenis smooth scroll plays cleanly.
+   1000vh = 1× approach + 5× base animation + 3× zone phases + 1× return */
 .showcase {
   position: relative;
-  background: var(--paper);
-  color: var(--ink);
+  margin-top: -1px;
+  height: 1000vh;
   font-family: var(--font-display);
-  padding: clamp(64px, 10vw, 120px) clamp(24px, 6vw, 80px);
+  color: var(--ink);
+}
+
+/* ── Sticky stage ──────────────────────────────────────────── */
+.stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
   overflow: hidden;
+  background: linear-gradient(to bottom, #f8f4ef 0%, var(--paper-warm) 100%);
 }
 
-/* ---------- Main 3-col layout ---------- */
-.inner {
-  display: grid;
-  grid-template-columns: 1fr 1.1fr 1fr;
-  align-items: center;
-  gap: clamp(24px, 4vw, 48px);
-  max-width: 1440px;
-  margin: 0 auto;
-}
+/* ── VIEW 1 — Title slide ───────────────────────────────────── */
 
-/* ---------- Left headline ---------- */
-.headlineLeft {
-  opacity: 0;
-}
-
-.kicker {
-  font-size: clamp(10px, 0.8vw, 12px);
-  font-weight: 500;
-  letter-spacing: 0.38em;
-  text-indent: 0.38em;
-  color: rgba(10, 13, 18, 0.4);
-  margin-bottom: clamp(16px, 2.5vh, 28px);
-}
-
-.headlineText {
-  font-size: clamp(36px, 5vw, 72px);
-  font-weight: 600;
-  line-height: 0.95;
-  letter-spacing: -0.03em;
-  color: var(--ink);
-}
-
-/* ---------- Aircraft SVG placeholder ---------- */
-.aircraftWrap {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  opacity: 0;
-  padding: clamp(16px, 2vw, 32px) 0;
-}
-
-.aircraftSvg {
-  width: clamp(140px, 18vw, 260px);
-  height: auto;
-  color: var(--ink);
-}
-
-/* ---------- Right model info ---------- */
-.headlineRight {
-  opacity: 0;
-}
-
-.modelNumber {
-  font-size: clamp(40px, 6vw, 88px);
-  font-weight: 600;
-  letter-spacing: -0.04em;
-  line-height: 0.9;
-  color: var(--ink);
-  margin-bottom: clamp(12px, 1.5vh, 20px);
-}
-
-.modelCategory {
-  font-size: clamp(13px, 1.1vw, 16px);
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  color: var(--ink);
-  line-height: 1.4;
-  margin-bottom: clamp(16px, 2.5vh, 28px);
-}
-
-.modelDesc {
-  font-size: clamp(13px, 1vw, 15px);
-  font-weight: 400;
-  line-height: 1.65;
-  color: rgba(10, 13, 18, 0.55);
-  max-width: 320px;
-}
-
-/* ---------- Divider ---------- */
-.divider {
-  max-width: 1440px;
-  margin: clamp(40px, 6vh, 64px) auto;
-  height: 1px;
-  background: rgba(10, 13, 18, 0.1);
-}
-
-/* ---------- Spec grid ---------- */
-.specs {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: clamp(24px, 4vh, 40px) clamp(24px, 4vw, 48px);
-  max-width: 1440px;
-  margin: 0 auto;
-}
-
-.specItem {
+.titleSlide {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  opacity: 0;
+  justify-content: space-between;
+  padding: clamp(40px, 6vh, 72px) clamp(24px, 6vw, 96px) clamp(36px, 5vh, 64px);
+  /* GSAP controls opacity */
 }
 
-.specLabel {
-  font-size: clamp(9px, 0.75vw, 11px);
-  font-weight: 500;
-  letter-spacing: 0.3em;
-  text-indent: 0.3em;
-  color: rgba(10, 13, 18, 0.38);
-  text-transform: uppercase;
+/* Headline row — "Fly in" ─── "Luxury" */
+.titleRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 0;
+  width: 100%;
 }
 
-.specValue {
-  font-size: clamp(18px, 2vw, 26px);
+.headLeft,
+.headRight {
+  font-size: clamp(56px, 9.5vw, 148px);
   font-weight: 600;
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.headRight { text-align: right; }
+
+/* Horizontal rule between the two words */
+.titleDivider {
+  flex: 1;
+  height: 1px;
+  background: var(--ink);
+  opacity: 0.13;
+  margin-bottom: 0.17em;
+  min-width: clamp(12px, 2vw, 40px);
+}
+
+/* Each character span — GSAP animates yPercent */
+.char { display: inline-block; }
+
+/* Bottom row: subtitle (left) + brand/desc (right) */
+.titleBot {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(24px, 5vw, 72px);
+  align-items: end;
+}
+
+.titleBotLeft { display: flex; flex-direction: column; }
+
+.subtitle {
+  font-size: clamp(18px, 2.2vw, 34px);
+  font-weight: 500;
+  line-height: 1.2;
   letter-spacing: -0.02em;
   color: var(--ink);
 }
 
-/* ---------- CTA ---------- */
-.ctaWrap {
-  max-width: 1440px;
-  margin: clamp(40px, 6vh, 64px) auto 0;
+.titleBotRight {
   display: flex;
-  justify-content: center;
-  opacity: 0;
+  flex-direction: column;
+  gap: clamp(14px, 2vh, 24px);
 }
 
-.cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 28px;
-  border-radius: 999px;
+.brandBlock {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.2vh, 14px);
+}
+
+.brandLine {
+  width: 100%;
+  height: 1px;
   background: var(--ink);
-  color: var(--paper);
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: 15px;
-  letter-spacing: 0.02em;
-  text-decoration: none;
-  transition:
-    background 0.35s var(--ease-out-cubic),
-    transform 0.35s var(--ease-out-cubic);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  opacity: 0.12;
 }
 
-.cta:hover {
-  background: var(--amber);
+.brandName {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(8px, 1vw, 14px);
+}
+
+.brandManu {
+  font-size: clamp(10px, 0.75vw, 12px);
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  color: rgba(10, 13, 18, 0.44);
+  text-transform: uppercase;
+}
+
+.brandModel {
+  font-size: clamp(18px, 2.2vw, 30px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
   color: var(--ink);
-  transform: translateY(-2px);
 }
 
-.cta svg {
-  transition: transform 0.35s var(--ease-out-cubic);
+.titleDesc {
+  font-size: clamp(12px, 0.9vw, 15px);
+  font-weight: 400;
+  line-height: 1.72;
+  color: rgba(10, 13, 18, 0.5);
+  max-width: 46ch;
 }
 
-.cta:hover svg {
-  transform: translateX(4px);
+/* ── VIEW 2 — Spec slide ────────────────────────────────────── */
+
+.specSlide {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr;
+  gap: clamp(24px, 4vw, 64px);
+  padding: 0 clamp(24px, 6vw, 96px);
+  align-items: center;
+  /* opacity: 0 set by GSAP on mount */
 }
 
-/* ---------- Responsive ---------- */
-@media (max-width: 900px) {
-  .inner {
+/* ── Left column — metrics ──────────────────────────────────── */
+
+.specLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.specLineH {
+  width: 100%;
+  height: 1px;
+  background: var(--ink);
+  opacity: 0.12;
+  margin-bottom: clamp(10px, 1.6vh, 18px);
+}
+
+.specManu {
+  font-size: clamp(9px, 0.68vw, 11px);
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  color: rgba(10, 13, 18, 0.42);
+  text-transform: uppercase;
+  margin-bottom: clamp(3px, 0.5vh, 6px);
+}
+
+.specModel {
+  font-size: clamp(28px, 3.6vw, 52px);
+  font-weight: 600;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  margin-bottom: clamp(12px, 2vh, 22px);
+}
+
+.specDivider {
+  width: 100%;
+  height: 1px;
+  background: var(--ink);
+  opacity: 0.1;
+  margin: clamp(10px, 1.6vh, 18px) 0;
+}
+
+.overviewRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  padding: clamp(4px, 0.65vh, 7px) 0;
+}
+
+.overviewLabel {
+  font-size: clamp(10px, 0.75vw, 12px);
+  font-weight: 400;
+  color: rgba(10, 13, 18, 0.48);
+  line-height: 1.4;
+  min-width: 0;
+}
+
+.overviewValue {
+  font-size: clamp(10px, 0.75vw, 12px);
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.specHeading {
+  display: block;
+  font-size: clamp(9px, 0.65vw, 11px);
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-indent: 0.22em;
+  color: rgba(10, 13, 18, 0.36);
+  text-transform: uppercase;
+  margin-bottom: clamp(6px, 1vh, 12px);
+}
+
+.specRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  padding: clamp(3px, 0.55vh, 6px) 0;
+}
+
+.specRowLabel {
+  font-size: clamp(10px, 0.75vw, 12px);
+  font-weight: 400;
+  color: rgba(10, 13, 18, 0.48);
+}
+
+.specRowValue {
+  font-size: clamp(10px, 0.75vw, 12px);
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+/* ── Center column — empty, plane overlaps this space ──────── */
+.specCenter {
+  /* intentionally empty — the absolute planeWrap sits over this */
+  min-height: 200px;
+}
+
+/* ── Right column — description ─────────────────────────────── */
+
+.specRight {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2.5vh, 28px);
+}
+
+.specRightTitle {
+  font-size: clamp(22px, 2.8vw, 40px);
+  font-weight: 600;
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+
+.specRightSub {
+  font-size: clamp(13px, 1vw, 16px);
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.specRightBody {
+  font-size: clamp(12px, 0.9vw, 15px);
+  font-weight: 400;
+  line-height: 1.72;
+  color: rgba(10, 13, 18, 0.52);
+}
+
+/* ── Plane wrapper — floats above both slides ───────────────── */
+
+.planeWrap {
+  position: absolute;
+  /* left: 50%; top: 50% set in CSS; GSAP owns xPercent, yPercent, y */
+  left: 50%;
+  top: 50%;
+  z-index: 3;
+  pointer-events: none;
+  will-change: transform;
+  /* Jesko Jets style — wings bleed off viewport edges */
+  height: max(130vw, 110vh);
+  width: max(130vw, 110vh);
+}
+
+/* Both images fill the wrapper and stack */
+.planeImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  filter: drop-shadow(0 24px 52px rgba(10, 13, 18, 0.15));
+  will-change: opacity;
+  backface-visibility: hidden;
+}
+
+/* Blueprint image — starts invisible, has mask fade */
+.planeBp {
+  /* opacity: 0 set by GSAP on mount */
+  filter: drop-shadow(0 14px 32px rgba(30, 58, 138, 0.16));
+  -webkit-mask-image: radial-gradient(
+    ellipse 80% 70% at 50% 50%,
+    black 50%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    ellipse 80% 70% at 50% 50%,
+    black 50%,
+    transparent 100%
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 140%;
+  mask-size: 100% 140%;
+  -webkit-mask-position: 50% 50%;
+  mask-position: 50% 50%;
+}
+
+/* ── Feature zone panels ────────────────────────────────────── */
+/* Absolute overlays, full stage, one per zone.
+   Transparent bg — plane shows through. Text + SVG float above. */
+
+.zonePanel {
+  position: absolute;
+  inset: 0;
+  z-index: 4; /* above planeWrap (z:3) */
+  pointer-events: none;
+  /* opacity: 0 set by GSAP */
+}
+
+.zonePanelLeft  .zoneCallout { left:  clamp(24px, 5vw, 80px); }
+.zonePanelRight .zoneCallout { right: clamp(24px, 5vw, 80px); }
+
+.zoneCallout {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  max-width: clamp(180px, 22vw, 340px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.8vh, 22px);
+}
+
+.zoneEyebrow {
+  font-size: clamp(9px, 0.68vw, 11px);
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
+  text-transform: uppercase;
+  color: var(--amber);
+}
+
+.zoneStat {
+  font-size: clamp(40px, 6.2vw, 96px);
+  font-weight: 600;
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+}
+
+.zoneBody {
+  font-size: clamp(12px, 0.9vw, 15px);
+  font-weight: 400;
+  line-height: 1.72;
+  color: rgba(10, 13, 18, 0.54);
+}
+
+/* SVG annotation line — covers full stage, non-scaling stroke */
+.zoneSvg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.zoneLine {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 0.6;
+  stroke-dasharray: 4 3;
+  opacity: 0.35;
+  vector-effect: non-scaling-stroke;
+}
+
+.zoneDot {
+  fill: var(--amber);
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  .specSlide {
+    grid-template-columns: 1fr 1.2fr 1fr;
+    gap: clamp(16px, 3vw, 40px);
+  }
+}
+
+@media (max-width: 768px) {
+  .titleBot {
     grid-template-columns: 1fr;
-    text-align: center;
+    gap: clamp(16px, 3vh, 28px);
   }
 
-  .aircraftWrap {
-    order: -1;
+  .specSlide {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    padding: clamp(24px, 4vh, 48px) clamp(16px, 5vw, 32px);
+    gap: clamp(24px, 4vh, 40px);
+    overflow-y: auto;
   }
 
-  .modelDesc {
-    max-width: 100%;
-  }
+  .specCenter { display: none; } /* plane is absolute — still visible */
 
-  .specs {
-    grid-template-columns: repeat(2, 1fr);
+  .planeWrap {
+    height: max(150vw, 90vh);
+    width: max(150vw, 90vh);
   }
 }
 
-@media (max-width: 560px) {
-  .specs {
-    grid-template-columns: repeat(2, 1fr);
+@media (max-width: 540px) {
+  .headLeft,
+  .headRight {
+    font-size: clamp(44px, 13vw, 80px);
+  }
+
+  .titleSlide {
+    padding-left: clamp(16px, 5vw, 28px);
+    padding-right: clamp(16px, 5vw, 28px);
+  }
+
+  .planeWrap {
+    height: max(180vw, 85vh);
+    width: max(180vw, 85vh);
   }
 }
